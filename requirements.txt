@@ -1,0 +1,6 @@
+munch==2.5.0
+PyYAML==5.4.1
+tensorboard==2.3.0
+tqdm==4.50.2
+packaging==21.0
+protobuf==3.20.*
