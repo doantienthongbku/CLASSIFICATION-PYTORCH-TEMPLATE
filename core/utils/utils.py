@@ -13,37 +13,6 @@ def set_random_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def compute_mean_std(train_dataset, batch_size, num_workers):
-    loader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        shuffle=False
-    )
-
-    num_samples = 0.
-    channel_mean = torch.Tensor([0., 0., 0.])
-    channel_std = torch.Tensor([0., 0., 0.])
-    
-    for samples in tqdm(loader):
-        X, _ = samples
-        channel_mean += X.mean((2, 3)).sum(0)
-        num_samples += X.size(0)
-    channel_mean /= num_samples
-
-    for samples in tqdm(loader):
-        X, _ = samples
-        batch_samples = X.size(0)
-        X = X.permute(0, 2, 3, 1).reshape(-1, 3)
-        channel_std += ((X - channel_mean) ** 2).mean(0) * batch_samples
-    channel_std = torch.sqrt(channel_std / num_samples)
-
-    mean, std = channel_mean.tolist(), channel_std.tolist()
-    print('mean: {}'.format(mean))
-    print('std: {}'.format(std))
-    return mean, std
-
-
 def save_checkpoint(model, epoch, network, acc1, optimizer, save_path):
     if isinstance(model, torch.nn.DataParallel):
         state_dict = model.module.state_dict()
@@ -87,17 +56,6 @@ def _print_config(config, indentation=''):
             _print_config(value, indentation + '    ')
         else:
             print('{}{}: {}'.format(indentation, key, value))
-            
-            
-def print_dataset_info(datasets):
-    train_dataset, test_dataset, val_dataset = datasets
-    print('=========================')
-    print('Dataset Loaded.')
-    print('Categories:\t{}'.format(len(train_dataset.classes)))
-    print('Training:\t{}'.format(len(train_dataset)))
-    print('Validation:\t{}'.format(len(val_dataset)))
-    print('Test:\t\t{}'.format(len(test_dataset)))
-    print('=========================')
     
     
 # unnormalize image for visualization
@@ -124,3 +82,13 @@ def select_target_type(y, criterion):
     else:
         raise NotImplementedError('Not implemented criterion.')
     return y
+
+def print_dataset_info(datasets):
+    train_dataset, test_dataset, val_dataset = datasets
+    print('=========================')
+    print('Dataset Loaded.')
+    print('Categories:\t{}'.format(len(train_dataset.classes)))
+    print('Training:\t{}'.format(len(train_dataset)))
+    print('Validation:\t{}'.format(len(val_dataset)))
+    print('Test:\t\t{}'.format(len(test_dataset)))
+    print('=========================')

@@ -1,5 +1,5 @@
 base:
-  data_path: /path/to/your/dataset
+  data_path: ../dataset
   data_index: null # alternative way to build dataset. check README for more details
   save_path: ../runs/save
   log_path: ../runs/logs
@@ -42,12 +42,24 @@ train:
   pin_memory: true # enables fast data transfer to CUDA-enabled GPUs
 
 solver:
-  optimizer: SGD # SGD / ADAM
+  optimizer: SGD # SGD / ADAM / ADAMW / ADAGRAD
   learning_rate: 0.001 # initial learning rate
-  lr_scheduler: cosine # available schedulers are list in 'scheduler_args' below. please remember to update scheduler_args when number of epoch changes.
-  momentum: 0.9 # only for SGD. set to 0 to disable momentum
-  nesterov: true # only for SGD.
+  lr_scheduler: cosine # available schedulers are list in 'scheduler_args' below
   weight_decay: 0.0005 # set to 0 to disable weight decay
+
+optimizer_args:
+  SGD:
+    momentum: 0.9  # set to 0 to disable momentum
+    nesterov: true
+  ADAM: # same as ADAMW
+    betas1: 0.9
+    betas2: 0.999
+    eps: 1e-08
+    amsgrad: False
+  ADAGRAD:
+    lr_decay: 0
+    initial_accumulator_value: 0
+    eps: 1e-10
 
 criterion_args:
   cross_entropy: {}
@@ -75,9 +87,6 @@ scheduler_args:
     patience: 5 # number of epochs with no improvement after which learning rate will be reduced.
     threshold: 0.0001 # threshold for measuring the new optimum
     eps: 0.00001 # minimal decay applied to learning rate
-  clipped_cosine:
-    T_max: 50
-    min_lr: 0.0001
 
 data_augmentation_args:
   horizontal_flip:

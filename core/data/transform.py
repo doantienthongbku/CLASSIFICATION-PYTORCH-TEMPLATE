@@ -3,7 +3,7 @@ from torchvision import transforms
 from packaging import version
 
 
-def data_transforms_pytorch(cfg):
+def data_transforms_torchvision(cfg):
     data_aug = cfg.data.data_augmentation
     aug_args = cfg.data_augmentation_args
     
